@@ -1,0 +1,74 @@
+{% extends "layouts/dashboard.html" %}
+{% block title %}Edit Student — HMS{% endblock %}
+{% block page_title %}Edit Student{% endblock %}
+{% block sidebar_role %}Admin Panel{% endblock %}
+{% block sidebar_nav %}{% include 'admin/_nav.html' %}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center animate-fade-in-up">
+  <div class="col-lg-8">
+    <div class="hms-card">
+      <div class="hms-card-header">
+        <span class="hms-card-title">
+          <i class="bi bi-pencil-square text-primary"></i>
+          Edit — {{ student.full_name }}
+        </span>
+        <a href="{{ url_for('admin.students') }}" class="btn-hms-outline" style="padding:0.4rem 1rem;font-size:0.82rem;">
+          <i class="bi bi-arrow-left me-1"></i> Back
+        </a>
+      </div>
+      <div class="hms-card-body">
+        <form method="POST" action="{{ url_for('admin.edit_student', student_id=student.student_id) }}" novalidate>
+          <div class="row g-4">
+            <div class="col-md-6">
+              <label class="form-label fw-600" style="font-size:0.85rem;">Registration Number *</label>
+              <input type="text" name="registration_number" class="hms-input" value="{{ student.registration_number }}" required/>
+              <div class="form-text" style="font-size:0.75rem;color:var(--hms-text-muted);">Unique student registration ID / roll number</div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-600" style="font-size:0.85rem;">Email Address</label>
+              <input type="email" class="hms-input" value="{{ student.email }}" disabled style="opacity:0.75;cursor:not-allowed;background:rgba(255,255,255,0.04);"/>
+              <div class="form-text" style="font-size:0.75rem;color:var(--hms-text-muted);">Account login email</div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-600" style="font-size:0.85rem;">Full Name *</label>
+              <input type="text" name="full_name" class="hms-input" value="{{ student.full_name }}" required/>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-600" style="font-size:0.85rem;">Phone</label>
+              <input type="tel" name="phone" class="hms-input" value="{{ student.phone or '' }}"/>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-600" style="font-size:0.85rem;">Department</label>
+              <input type="text" name="department" class="hms-input" value="{{ student.department or '' }}"/>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-600" style="font-size:0.85rem;">Academic Year</label>
+              <input type="text" name="academic_year" class="hms-input" value="{{ student.academic_year or '' }}"/>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-600" style="font-size:0.85rem;">Guardian Name</label>
+              <input type="text" name="guardian_name" class="hms-input" value="{{ student.guardian_name or '' }}"/>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-600" style="font-size:0.85rem;">Guardian Phone</label>
+              <input type="tel" name="guardian_phone" class="hms-input" value="{{ student.guardian_phone or '' }}"/>
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-600" style="font-size:0.85rem;">Address</label>
+              <textarea name="address" class="hms-input" rows="2" style="resize:vertical;">{{ student.address or '' }}</textarea>
+            </div>
+            <div class="col-12 d-flex gap-3">
+              <button type="submit" class="btn-hms-primary" data-loading>
+                <span class="btn-text"><i class="bi bi-check2-circle me-1"></i> Save Changes</span>
+                <span class="btn-spinner"></span>
+              </button>
+              <a href="{{ url_for('admin.students') }}" class="btn-hms-outline">Cancel</a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

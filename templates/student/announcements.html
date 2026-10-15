@@ -1,0 +1,52 @@
+{% extends "layouts/dashboard.html" %}
+{% block title %}Announcements — HMS{% endblock %}
+{% block page_title %}Announcements{% endblock %}
+{% block sidebar_role %}Student Portal{% endblock %}
+{% block sidebar_nav %}{% include 'student/_nav.html' %}{% endblock %}
+
+{% block content %}
+{% set cat_icons = {'General':'bi-info-circle','Academic':'bi-book','Maintenance':'bi-tools','Events':'bi-calendar-event','Emergency':'bi-exclamation-triangle'} %}
+{% set cat_colors = {'General':'var(--hms-blue)','Academic':'#7C3AED','Maintenance':'var(--hms-warning)','Events':'var(--hms-teal)','Emergency':'var(--hms-danger)'} %}
+
+{% if announcements %}
+<div class="row g-4">
+  {% for ann in announcements %}
+  {% set cat = ann.category %}
+  <div class="col-lg-6 animate-fade-in-up" style="animation-delay:{{ loop.index0 * 0.07 }}s;">
+    <div class="announcement-card cat-{{ cat.lower() }}">
+      <div class="d-flex align-items-start gap-3">
+        <div style="width:40px;height:40px;border-radius:10px;background:{{ cat_colors.get(cat,'var(--hms-blue)') }}22;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.1rem;color:{{ cat_colors.get(cat,'var(--hms-blue)') }};">
+          <i class="bi {{ cat_icons.get(cat,'bi-info-circle') }}"></i>
+        </div>
+        <div class="flex-grow-1">
+          <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+            <h6 class="mb-0 fw-700" style="font-size:0.9rem;">{{ ann.title }}</h6>
+            <span class="badge-hms" style="background:{{ cat_colors.get(cat,'var(--hms-blue)') }}18;color:{{ cat_colors.get(cat,'var(--hms-blue)') }};">{{ cat }}</span>
+          </div>
+          <div class="ann-collapsible mb-2" style="font-size:0.83rem;color:var(--hms-text-muted);line-height:1.6;">
+            {{ ann.message }}
+          </div>
+          <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <small style="color:var(--hms-text-muted);font-size:0.72rem;">
+              <i class="bi bi-calendar3 me-1"></i>{{ ann.created_at|format_date('%B %d, %Y') }}
+              {% if ann.expiry_date %}&nbsp;·&nbsp; Expires {{ ann.expiry_date }}{% endif %}
+              &nbsp;·&nbsp; Posted by {{ ann.created_by_name }}
+            </small>
+            <button class="ann-toggle" style="background:none;border:none;color:var(--hms-blue);font-size:0.75rem;font-weight:600;padding:0;cursor:pointer;">Read more</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="hms-card">
+  <div class="empty-state py-5">
+    <div class="empty-state-icon" style="font-size:4rem;"><i class="bi bi-megaphone"></i></div>
+    <div class="empty-state-title">No active announcements</div>
+    <div class="empty-state-text">Check back later for hostel updates.</div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

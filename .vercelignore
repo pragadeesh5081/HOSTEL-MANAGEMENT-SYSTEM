@@ -1,0 +1,21 @@
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Tests and testing artifacts
+tests/
+.pytest_cache/
+.coverage
+htmlcov/
+pytest.ini
+
+# Environment and local docs
+.env
+reset_pw.sql
+database.sql
+database_mysql.sql

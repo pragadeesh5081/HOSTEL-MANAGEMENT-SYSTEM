@@ -1,0 +1,56 @@
+{% extends "layouts/dashboard.html" %}
+{% block title %}Add Room — HMS{% endblock %}
+{% block page_title %}Add Room{% endblock %}
+{% block sidebar_role %}Admin Panel{% endblock %}
+{% block sidebar_nav %}{% include 'admin/_nav.html' %}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center animate-fade-in-up">
+  <div class="col-lg-6">
+    <div class="hms-card">
+      <div class="hms-card-header">
+        <span class="hms-card-title"><i class="bi bi-building text-primary"></i> Add New Room</span>
+        <a href="{{ url_for('admin.rooms') }}" class="btn-hms-outline" style="padding:0.4rem 1rem;font-size:0.82rem;">
+          <i class="bi bi-arrow-left me-1"></i> Back
+        </a>
+      </div>
+      <div class="hms-card-body">
+        <form method="POST" action="{{ url_for('admin.add_room') }}" novalidate>
+          <div class="row g-4">
+            <div class="col-md-6">
+              <label class="form-label fw-600" style="font-size:0.85rem;">Room Number *</label>
+              <input type="text" name="room_number" class="hms-input" required
+                     placeholder="e.g. 101" value="{{ request.form.get('room_number','') }}"/>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-600" style="font-size:0.85rem;">Floor *</label>
+              <input type="number" name="floor" class="hms-input" required min="1" max="20"
+                     value="{{ request.form.get('floor','1') }}"/>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-600" style="font-size:0.85rem;">Room Type *</label>
+              <select name="room_type" class="hms-input filter-select" style="padding:0.65rem 1rem;">
+                {% for t in ['Single','Double','Triple','Dormitory'] %}
+                <option value="{{ t }}" {% if request.form.get('room_type',t)==t %}selected{% endif %}>{{ t }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-600" style="font-size:0.85rem;">Capacity *</label>
+              <input type="number" name="capacity" class="hms-input" required min="1" max="20"
+                     value="{{ request.form.get('capacity','1') }}"/>
+            </div>
+            <div class="col-12 d-flex gap-3">
+              <button type="submit" class="btn-hms-primary" data-loading>
+                <span class="btn-text"><i class="bi bi-building-add me-1"></i> Add Room</span>
+                <span class="btn-spinner"></span>
+              </button>
+              <a href="{{ url_for('admin.rooms') }}" class="btn-hms-outline">Cancel</a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

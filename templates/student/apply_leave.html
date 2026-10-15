@@ -1,0 +1,58 @@
+{% extends "layouts/dashboard.html" %}
+{% block title %}Apply Leave — HMS{% endblock %}
+{% block page_title %}Apply for Leave{% endblock %}
+{% block sidebar_role %}Student Portal{% endblock %}
+{% block sidebar_nav %}{% include 'student/_nav.html' %}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center animate-fade-in-up">
+  <div class="col-lg-7">
+    <div class="hms-card">
+      <div class="hms-card-header">
+        <span class="hms-card-title"><i class="bi bi-calendar-plus text-primary"></i> Leave Application</span>
+      </div>
+      <div class="hms-card-body">
+        <form method="POST" action="{{ url_for('student.apply_leave') }}" novalidate>
+          <div class="row g-4">
+            <div class="col-md-6">
+              <label class="form-label fw-600" style="font-size:0.85rem;">Start Date *</label>
+              <input type="date" name="start_date" class="hms-input" required
+                     value="{{ request.form.get('start_date','') }}"/>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-600" style="font-size:0.85rem;">End Date *</label>
+              <input type="date" name="end_date" class="hms-input" required
+                     value="{{ request.form.get('end_date','') }}"/>
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-600" style="font-size:0.85rem;">Destination *</label>
+              <input type="text" name="destination" class="hms-input" required placeholder="Where are you going?"
+                     value="{{ request.form.get('destination','') }}"/>
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-600" style="font-size:0.85rem;">Reason *</label>
+              <textarea name="reason" class="hms-input" rows="3" required
+                        placeholder="Provide a brief reason for your leave request">{{ request.form.get('reason','') }}</textarea>
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-600" style="font-size:0.85rem;">Emergency Contact *</label>
+              <input type="tel" name="emergency_contact" class="hms-input" required
+                     placeholder="Phone number of someone reachable during leave"
+                     value="{{ request.form.get('emergency_contact','') }}"/>
+            </div>
+            <div class="col-12 d-flex gap-3">
+              <button type="submit" class="btn-hms-primary" data-loading>
+                <span class="btn-text"><i class="bi bi-send me-1"></i> Submit Application</span>
+                <span class="btn-spinner"></span>
+              </button>
+              <a href="{{ url_for('student.leave_history') }}" class="btn-hms-outline">
+                <i class="bi bi-clock-history me-1"></i> View History
+              </a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

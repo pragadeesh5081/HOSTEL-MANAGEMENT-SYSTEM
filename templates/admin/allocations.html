@@ -1,0 +1,103 @@
+{% extends "layouts/dashboard.html" %}
+{% block title %}Room Allocations — HMS{% endblock %}
+{% block page_title %}Room Allocations{% endblock %}
+{% block sidebar_role %}Admin Panel{% endblock %}
+{% block sidebar_nav %}{% include 'admin/_nav.html' %}{% endblock %}
+
+{% block content %}
+<div class="row g-5">
+  <!-- Allocate Room Form -->
+  <div class="col-lg-4">
+    <div class="hms-card animate-fade-in-up">
+      <div class="hms-card-header">
+        <span class="hms-card-title"><i class="bi bi-plus-circle text-primary"></i> Allocate Room</span>
+      </div>
+      <div class="hms-card-body">
+        <form method="POST" action="{{ url_for('admin.allocate_room') }}" novalidate>
+          <div class="row g-4">
+            <div class="col-12">
+              <label class="form-label fw-600" style="font-size:0.85rem;">Student *</label>
+              <select name="student_id" class="hms-input filter-select" required style="padding:0.65rem 1rem;">
+                <option value="" disabled selected>Select student</option>
+                {% for s in students %}
+                <option value="{{ s.student_id }}">{{ s.full_name }} ({{ s.registration_number }})</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-600" style="font-size:0.85rem;">Room *</label>
+              <select name="room_id" class="hms-input filter-select" required style="padding:0.65rem 1rem;">
+                <option value="" disabled selected>Select room</option>
+                {% for r in rooms %}
+                {% if r.status == 'Available' %}
+                <option value="{{ r.room_id }}">Room {{ r.room_number }} — Fl.{{ r.floor }} · {{ r.room_type }} ({{ r.occupied_count }}/{{ r.capacity }})</option>
+                {% endif %}
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-12">
+              <button type="submit" class="btn-hms-primary w-100" data-loading>
+                <span class="btn-text"><i class="bi bi-door-open me-1"></i> Allocate Room</span>
+                <span class="btn-spinner"></span>
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Allocations Table -->
+  <div class="col-lg-8">
+    <div class="hms-card animate-fade-in-up stagger-2">
+      <div class="hms-card-header">
+        <span class="hms-card-title"><i class="bi bi-list-check text-primary"></i> Active Allocations</span>
+        <div class="hms-search" style="width:220px;">
+          <i class="bi bi-search hms-search-icon"></i>
+          <input type="text" class="hms-search-input" data-search-table="allocTable" placeholder="Search…" style="width:100%;"/>
+        </div>
+      </div>
+      <div class="table-responsive-hms">
+        {% set active = allocations | selectattr('status','equalto','Active') | list %}
+        {% if active %}
+        <table class="hms-table" id="allocTable">
+          <thead>
+            <tr><th>Student</th><th>Room</th><th>Allocated On</th><th>Status</th><th>Action</th></tr>
+          </thead>
+          <tbody>
+          {% for a in allocations %}
+          <tr>
+            <td>
+              <div class="fw-600" style="font-size:0.85rem;">{{ a.full_name }}</div>
+              <div style="font-size:0.75rem;color:var(--hms-text-muted);">{{ a.registration_number }}</div>
+            </td>
+            <td class="fw-600">Room {{ a.room_number }}<br><small style="color:var(--hms-text-muted);font-weight:400;">Floor {{ a.floor }}</small></td>
+            <td><small>{{ a.allocation_date }}</small></td>
+            <td><span class="badge-hms badge-{{ a.status.lower() }}">{{ a.status }}</span></td>
+            <td>
+              {% if a.status == 'Active' %}
+              <form method="POST" action="{{ url_for('admin.vacate_room', allocation_id=a.allocation_id) }}" style="display:inline;">
+                <button type="submit" class="btn-danger-sm"
+                        data-confirm="Vacate room for {{ a.full_name }}?">
+                  Vacate
+                </button>
+              </form>
+              {% else %}
+              <span style="font-size:0.75rem;color:var(--hms-text-muted);">{{ a.vacate_date or '—' }}</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+          <div class="empty-state-icon"><i class="bi bi-door-closed"></i></div>
+          <div class="empty-state-title">No active allocations</div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

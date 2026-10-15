@@ -1,0 +1,86 @@
+{% extends "layouts/dashboard.html" %}
+{% block title %}Manage Admins — HMS{% endblock %}
+{% block page_title %}Manage Admins{% endblock %}
+{% block sidebar_role %}Admin Panel{% endblock %}
+{% block sidebar_nav %}{% include 'admin/_nav.html' %}{% endblock %}
+{% block topbar_actions %}
+<a href="{{ url_for('admin.add_admin') }}" class="btn-hms-primary" style="padding:0.45rem 1rem;font-size:0.82rem;">
+  <i class="bi bi-person-plus me-1"></i> Add Admin
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="hms-card animate-fade-in-up">
+  <div class="hms-card-header">
+    <span class="hms-card-title"><i class="bi bi-shield-lock text-primary"></i> All Administrators ({{ admins|length }})</span>
+    <div class="hms-search" style="width:240px;">
+      <i class="bi bi-search hms-search-icon"></i>
+      <input type="text" class="hms-search-input" data-search-table="adminsTable" placeholder="Search admins…" style="width:100%;"/>
+    </div>
+  </div>
+  <div class="table-responsive-hms">
+    {% if admins %}
+    <table class="hms-table" id="adminsTable">
+      <thead>
+        <tr>
+          <th>Administrator</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Created</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for a in admins %}
+      <tr>
+        <td>
+          <div class="d-flex align-items-center gap-2">
+            <div style="width:34px;height:34px;background:linear-gradient(135deg,#7C3AED,#DB2777);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:0.8rem;font-weight:700;flex-shrink:0;">
+              {{ a.full_name[0]|upper }}
+            </div>
+            <div>
+              <div class="fw-600" style="font-size:0.88rem;">{{ a.full_name }}
+                {% if a.user_id == session.user_id %}
+                <span style="font-size:0.7rem;background:rgba(124,58,237,0.2);color:#C4B5FD;padding:1px 7px;border-radius:20px;margin-left:4px;">You</span>
+                {% endif %}
+              </div>
+              <div style="font-size:0.75rem;color:var(--hms-text-muted);">Admin</div>
+            </div>
+          </div>
+        </td>
+        <td style="font-size:0.85rem;">{{ a.email }}</td>
+        <td>{{ a.phone or '—' }}</td>
+        <td><small style="color:var(--hms-text-muted);">{{ a.created_at[:10] if a.created_at else '—' }}</small></td>
+        <td>
+          {% if a.is_active %}
+          <span class="badge-hms badge-active">Active</span>
+          {% else %}
+          <span class="badge-hms badge-inactive">Inactive</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if a.user_id != session.user_id %}
+          <form method="POST" action="{{ url_for('admin.toggle_admin_status', user_id=a.user_id) }}" style="display:inline;">
+            <button type="submit" class="btn-danger-sm" data-confirm="Toggle status for {{ a.full_name }}?">
+              {{ 'Deactivate' if a.is_active else 'Activate' }}
+            </button>
+          </form>
+          {% else %}
+          <span style="font-size:0.78rem;color:var(--hms-text-muted);">—</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-state-icon"><i class="bi bi-shield-lock"></i></div>
+      <div class="empty-state-title">No admin accounts found</div>
+      <a href="{{ url_for('admin.add_admin') }}" class="btn-hms-primary mt-3">Add First Admin</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

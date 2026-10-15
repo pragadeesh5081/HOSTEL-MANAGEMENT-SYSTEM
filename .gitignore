@@ -1,0 +1,30 @@
+# Virtual Environments
+venv/
+.venv/
+env/
+ENV/
+
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local Environment Variables
+.env
+
+# Database journal & temp files (keep template hms.db for initial seed)
+*.db-journal
+*.db-wal
+*.db-shm
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

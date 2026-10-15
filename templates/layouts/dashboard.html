@@ -1,0 +1,77 @@
+{% extends "layouts/base.html" %}
+{% block body %}
+
+<!-- Sidebar backdrop (mobile) -->
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+<!-- ── Sidebar ──────────────────────────────────────────── -->
+<nav class="hms-sidebar" id="hmsSidebar">
+  <!-- Brand -->
+  <div class="sidebar-brand">
+    <div class="brand-logo">H</div>
+    <div class="brand-text">
+      <span class="brand-name">HMS Portal</span>
+      <span class="brand-sub">{% block sidebar_role %}Student{% endblock %}</span>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <div class="sidebar-nav">
+    {% block sidebar_nav %}{% endblock %}
+  </div>
+
+  <!-- Footer -->
+  <div class="sidebar-footer">
+    <div class="user-card" title="{{ session.name }}">
+      <div class="user-avatar">{{ session.name[0]|upper if session.name else 'U' }}</div>
+      <div class="user-info">
+        <div class="user-name">{{ session.name }}</div>
+        <div class="user-role">{{ session.role|capitalize }}</div>
+      </div>
+      <a href="{{ url_for('auth.logout') }}" class="ms-auto text-muted" style="font-size:1rem; color:rgba(152,162,179,0.7)!important; text-decoration:none;" title="Logout">
+        <i class="bi bi-box-arrow-right"></i>
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- Sidebar toggle (desktop) -->
+<button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+  <i class="bi bi-chevron-left toggle-icon"></i>
+</button>
+
+<!-- ── Main ──────────────────────────────────────────────── -->
+<main class="hms-main" id="hmsMain">
+  <!-- Topbar -->
+  <header class="hms-topbar">
+    <div class="d-flex align-items-center gap-3">
+      <button class="btn btn-sm hms-mobile-menu-btn" id="mobileSidebarBtn"
+              style="display:none; background:var(--hms-surface); border:1px solid var(--hms-border);">
+        <i class="bi bi-list fs-5"></i>
+      </button>
+      <div>
+        <h6 class="mb-0 fw-700" style="font-weight:700; font-size:0.95rem;">
+          {% block page_title %}Dashboard{% endblock %}
+        </h6>
+        {% block breadcrumb %}{% endblock %}
+      </div>
+    </div>
+    <div class="topbar-actions">
+      {% block topbar_actions %}{% endblock %}
+      <div class="topbar-avatar" title="{{ session.name }}">
+        {{ session.name[0]|upper if session.name else 'U' }}
+      </div>
+    </div>
+  </header>
+
+  <!-- Page Content -->
+  <div class="hms-page-content">
+    {% block content %}{% endblock %}
+  </div>
+</main>
+
+<!-- Modals rendered outside main layout to guarantee root-level fixed positioning -->
+{% block modals %}{% endblock %}
+
+{% endblock %}
+

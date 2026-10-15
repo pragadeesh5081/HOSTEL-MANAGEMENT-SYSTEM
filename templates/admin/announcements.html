@@ -1,0 +1,68 @@
+{% extends "layouts/dashboard.html" %}
+{% block title %}Announcements — HMS{% endblock %}
+{% block page_title %}Manage Announcements{% endblock %}
+{% block sidebar_role %}Admin Panel{% endblock %}
+{% block sidebar_nav %}{% include 'admin/_nav.html' %}{% endblock %}
+{% block topbar_actions %}
+<a href="{{ url_for('admin.add_announcement') }}" class="btn-hms-primary" style="padding:0.45rem 1rem;font-size:0.82rem;">
+  <i class="bi bi-plus-lg me-1"></i> New Announcement
+</a>
+{% endblock %}
+
+{% block content %}
+{% set cat_icons = {'General':'bi-info-circle','Academic':'bi-book','Maintenance':'bi-tools','Events':'bi-calendar-event','Emergency':'bi-exclamation-triangle'} %}
+{% set cat_colors = {'General':'var(--hms-blue)','Academic':'#7C3AED','Maintenance':'var(--hms-warning)','Events':'var(--hms-teal)','Emergency':'var(--hms-danger)'} %}
+
+{% if announcements %}
+<div class="row g-4">
+  {% for ann in announcements %}
+  {% set cat = ann.category %}
+  <div class="col-lg-6 animate-fade-in-up" style="animation-delay:{{ loop.index0 * 0.06 }}s;">
+    <div class="announcement-card cat-{{ cat.lower() }}">
+      <div class="d-flex align-items-start gap-3">
+        <div style="width:40px;height:40px;border-radius:10px;background:{{ cat_colors.get(cat,'var(--hms-blue)') }}22;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.1rem;color:{{ cat_colors.get(cat,'var(--hms-blue)') }};">
+          <i class="bi {{ cat_icons.get(cat,'bi-info-circle') }}"></i>
+        </div>
+        <div class="flex-grow-1">
+          <div class="d-flex align-items-start justify-content-between gap-2">
+            <div>
+              <h6 class="mb-1 fw-700" style="font-size:0.9rem;">{{ ann.title }}</h6>
+              <span class="badge-hms" style="background:{{ cat_colors.get(cat,'var(--hms-blue)') }}18;color:{{ cat_colors.get(cat,'var(--hms-blue)') }};">{{ cat }}</span>
+            </div>
+            <div class="d-flex gap-2 flex-shrink-0">
+              <a href="{{ url_for('admin.edit_announcement', ann_id=ann.announcement_id) }}"
+                 class="btn-hms-outline" style="padding:3px 10px;font-size:0.75rem;">
+                <i class="bi bi-pencil"></i>
+              </a>
+              <form method="POST" action="{{ url_for('admin.delete_announcement', ann_id=ann.announcement_id) }}" style="display:inline;">
+                <button type="submit" class="btn-danger-sm"
+                        data-confirm="Delete '{{ ann.title }}'? This cannot be undone.">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </form>
+            </div>
+          </div>
+          <div class="ann-collapsible mt-2 mb-2" style="font-size:0.82rem;color:var(--hms-text-muted);line-height:1.6;">{{ ann.message }}</div>
+          <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <small style="color:var(--hms-text-muted);font-size:0.72rem;">
+              <i class="bi bi-calendar3 me-1"></i>{{ ann.created_at|format_date('%b %d, %Y') }}
+              {% if ann.expiry_date %} &nbsp;·&nbsp; Expires {{ ann.expiry_date }}{% endif %}
+            </small>
+            <button class="ann-toggle" style="background:none;border:none;color:var(--hms-blue);font-size:0.75rem;font-weight:600;padding:0;cursor:pointer;">Read more</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="hms-card">
+  <div class="empty-state py-5">
+    <div class="empty-state-icon" style="font-size:4rem;"><i class="bi bi-megaphone"></i></div>
+    <div class="empty-state-title">No announcements yet</div>
+    <a href="{{ url_for('admin.add_announcement') }}" class="btn-hms-primary mt-3">Create First Announcement</a>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

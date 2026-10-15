@@ -1,0 +1,226 @@
+{% extends "layouts/dashboard.html" %}
+{% block title %}Student Dashboard — HMS{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block sidebar_role %}Student Portal{% endblock %}
+
+{% block sidebar_nav %}{% include 'student/_nav.html' %}{% endblock %}
+
+{% block content %}
+<!-- Welcome Banner -->
+<div class="hms-card mb-5 animate-fade-in-up" style="background:linear-gradient(135deg,#101828 0%,#1e3a5f 50%,#0f3460 100%); border:none; color:#fff; overflow:hidden; position:relative;">
+  <div style="position:absolute;right:-30px;top:-30px;width:200px;height:200px;background:rgba(37,99,235,0.15);border-radius:50%;filter:blur(40px);"></div>
+  <div style="position:absolute;right:60px;bottom:-40px;width:150px;height:150px;background:rgba(20,184,166,0.1);border-radius:50%;filter:blur(30px);"></div>
+  <div class="hms-card-body d-flex align-items-center justify-content-between flex-wrap gap-3">
+    <div>
+      <p class="mb-1" style="color:rgba(255,255,255,0.6);font-size:0.85rem;">Welcome back 👋</p>
+      <h2 class="mb-1 fw-700" style="font-size:1.6rem;font-weight:800;">{{ student.full_name }}</h2>
+      <p class="mb-0" style="color:rgba(255,255,255,0.55);font-size:0.85rem;">
+        {{ student.registration_number }} &nbsp;·&nbsp; {{ student.department or 'Student' }}
+      </p>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+      <a href="{{ url_for('student.apply_leave') }}" class="btn btn-sm" style="background:rgba(255,255,255,0.12);color:#fff;border:1px solid rgba(255,255,255,0.2);border-radius:8px;backdrop-filter:blur(8px);">
+        <i class="bi bi-calendar-plus me-1"></i> Apply Leave
+      </a>
+      <a href="{{ url_for('student.submit_complaint') }}" class="btn btn-sm" style="background:rgba(20,184,166,0.25);color:#2DD4BF;border:1px solid rgba(20,184,166,0.3);border-radius:8px;">
+        <i class="bi bi-chat-left-text me-1"></i> New Complaint
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Stats Grid -->
+<div class="stats-grid mb-5">
+  <div class="stat-card stagger-1">
+    <div class="d-flex align-items-center justify-content-between">
+      <div>
+        <div class="stat-label">Current Room</div>
+        <div class="stat-number" style="font-size:1.4rem;">
+          {% if allocation %}Room {{ allocation.room_number }}{% else %}—{% endif %}
+        </div>
+        <small style="color:var(--hms-text-muted); font-size:0.75rem;">
+          {% if allocation %}Floor {{ allocation.floor }} · {{ allocation.room_type }}{% else %}Not allocated{% endif %}
+        </small>
+        {% if recent_changes %}
+          {% set latest_req = recent_changes[0] %}
+          <div class="mt-1" style="font-size:0.75rem; font-weight:600;">
+            {% if latest_req.status == 'Approved' %}
+              <span style="color:var(--hms-success);"><i class="bi bi-check-circle-fill me-1"></i>Moved to Room {{ latest_req.requested_room }}</span>
+            {% elif latest_req.status == 'Pending' %}
+              <span style="color:var(--hms-warning);"><i class="bi bi-clock-fill me-1"></i>Change to Room {{ latest_req.requested_room }} Pending</span>
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
+      <div class="stat-icon stat-icon-blue"><i class="bi bi-door-open"></i></div>
+    </div>
+  </div>
+  <div class="stat-card stagger-2">
+    <div class="d-flex align-items-center justify-content-between">
+      <div>
+        <div class="stat-label">Pending Leaves</div>
+        <div class="stat-number" data-count="{{ pending_leaves }}">0</div>
+      </div>
+      <div class="stat-icon stat-icon-amber"><i class="bi bi-calendar-minus"></i></div>
+    </div>
+  </div>
+  <div class="stat-card stagger-3">
+    <div class="d-flex align-items-center justify-content-between">
+      <div>
+        <div class="stat-label">Open Complaints</div>
+        <div class="stat-number" data-count="{{ open_complaints }}">0</div>
+      </div>
+      <div class="stat-icon stat-icon-red"><i class="bi bi-clipboard2-x"></i></div>
+    </div>
+  </div>
+  <div class="stat-card stagger-4">
+    <div class="d-flex align-items-center justify-content-between">
+      <div>
+        <div class="stat-label">Announcements</div>
+        <div class="stat-number" data-count="{{ total_announcements }}">0</div>
+      </div>
+      <div class="stat-icon stat-icon-teal"><i class="bi bi-megaphone"></i></div>
+    </div>
+  </div>
+</div>
+
+<!-- Content Grid -->
+<div class="row g-4 mb-4">
+  <!-- Recent Leaves -->
+  <div class="col-lg-6 animate-fade-in-up stagger-1">
+    <div class="hms-card h-100">
+      <div class="hms-card-header">
+        <span class="hms-card-title"><i class="bi bi-calendar-check text-primary"></i> Recent Leaves</span>
+        <div class="d-flex gap-2">
+          <a href="{{ url_for('student.apply_leave') }}" class="btn btn-sm btn-hms-primary" style="padding:0.25rem 0.75rem;font-size:0.78rem;">
+            <i class="bi bi-plus-lg me-1"></i> Apply
+          </a>
+          <a href="{{ url_for('student.leave_history') }}" class="btn btn-sm btn-hms-outline" style="padding:0.25rem 0.75rem;font-size:0.78rem;">View All</a>
+        </div>
+      </div>
+      <div class="hms-card-body p-0">
+        {% if recent_leaves %}
+        <div class="table-responsive-hms">
+          <table class="hms-table" id="recentLeavesTable">
+            <thead><tr><th>Dates</th><th>Destination</th><th>Status</th></tr></thead>
+            <tbody>
+            {% for l in recent_leaves %}
+            <tr>
+              <td>
+                <div class="fw-600" style="font-size:0.82rem;">{{ l.start_date }}</div>
+                <div style="font-size:0.72rem;color:var(--hms-text-muted);">to {{ l.end_date }}</div>
+              </td>
+              <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:0.82rem;" title="{{ l.destination }}">
+                {{ l.destination }}
+              </td>
+              <td>
+                <span class="badge-hms badge-{{ l.status.lower() }}">
+                  {{ l.status }}
+                </span>
+              </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="empty-state py-4">
+          <div class="empty-state-icon" style="font-size:2.5rem;"><i class="bi bi-calendar-check"></i></div>
+          <div class="empty-state-title" style="font-size:0.95rem;">No leave requests</div>
+          <div class="empty-state-text" style="font-size:0.8rem;">You haven't submitted any leave requests yet.</div>
+          <a href="{{ url_for('student.apply_leave') }}" class="btn btn-sm btn-hms-primary mt-2">Apply for Leave</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Complaints -->
+  <div class="col-lg-6 animate-fade-in-up stagger-2">
+    <div class="hms-card h-100">
+      <div class="hms-card-header">
+        <span class="hms-card-title"><i class="bi bi-clipboard2-data text-primary"></i> Recent Complaints</span>
+        <div class="d-flex gap-2">
+          <a href="{{ url_for('student.submit_complaint') }}" class="btn btn-sm btn-hms-primary" style="padding:0.25rem 0.75rem;font-size:0.78rem;">
+            <i class="bi bi-plus-lg me-1"></i> New
+          </a>
+          <a href="{{ url_for('student.my_complaints') }}" class="btn btn-sm btn-hms-outline" style="padding:0.25rem 0.75rem;font-size:0.78rem;">View All</a>
+        </div>
+      </div>
+      <div class="hms-card-body p-0">
+        {% if recent_complaints %}
+        <div class="table-responsive-hms">
+          <table class="hms-table" id="recentComplaintsTable">
+            <thead><tr><th>Title</th><th>Category</th><th>Status</th></tr></thead>
+            <tbody>
+            {% for c in recent_complaints %}
+            <tr>
+              <td class="fw-500" style="max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ c.title }}</td>
+              <td><small>{{ c.category }}</small></td>
+              <td>
+                {% set s = c.status.lower().replace(' ','') %}
+                <span class="badge-hms badge-{{ 'inprogress' if 'progress' in s else s }}">
+                  {{ c.status }}
+                </span>
+              </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="empty-state py-4">
+          <div class="empty-state-icon" style="font-size:2.5rem;"><i class="bi bi-clipboard2-check"></i></div>
+          <div class="empty-state-title" style="font-size:0.95rem;">No complaints yet</div>
+          <div class="empty-state-text" style="font-size:0.8rem;">You haven't submitted any complaints.</div>
+          <a href="{{ url_for('student.submit_complaint') }}" class="btn btn-sm btn-hms-primary mt-2">New Complaint</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Announcements -->
+<div class="row g-4">
+  <div class="col-12 animate-fade-in-up stagger-3">
+    <div class="hms-card">
+      <div class="hms-card-header">
+        <span class="hms-card-title"><i class="bi bi-megaphone text-primary"></i> Campus Announcements</span>
+        <a href="{{ url_for('student.announcements') }}" class="btn btn-sm btn-hms-outline">View All</a>
+      </div>
+      <div class="hms-card-body">
+        {% if announcements %}
+        <div class="row g-3">
+          {% for ann in announcements %}
+          {% set cat_class = ann.category.lower() %}
+          <div class="col-md-6 col-xl-4">
+            <div class="announcement-card cat-{{ cat_class }} h-100" style="animation-delay:{{ loop.index * 0.08 }}s;">
+              <div class="d-flex align-items-start justify-content-between gap-2">
+                <div>
+                  <div class="fw-600 mb-1" style="font-size:0.875rem;">{{ ann.title }}</div>
+                  <span class="badge-hms" style="background:#EFF6FF;color:var(--hms-blue);margin-bottom:6px;">{{ ann.category }}</span>
+                  <div class="ann-collapsible" style="font-size:0.8rem;color:var(--hms-text-muted);line-height:1.5;">{{ ann.message }}</div>
+                </div>
+              </div>
+              <div class="d-flex align-items-center justify-content-between mt-2">
+                <small style="color:var(--hms-text-muted);font-size:0.72rem;">
+                  <i class="bi bi-clock me-1"></i>{{ ann.created_at|format_date('%b %d, %Y') }}
+                </small>
+                <button class="ann-toggle" style="background:none;border:none;color:var(--hms-blue);font-size:0.75rem;font-weight:600;padding:0;cursor:pointer;">Read more</button>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state py-4">
+          <div class="empty-state-icon" style="font-size:2.5rem;"><i class="bi bi-megaphone"></i></div>
+          <div class="empty-state-title" style="font-size:0.95rem;">No active announcements</div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

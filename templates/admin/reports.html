@@ -1,0 +1,203 @@
+{% extends "layouts/dashboard.html" %}
+{% block title %}Reports — HMS{% endblock %}
+{% block page_title %}Reports & Analytics{% endblock %}
+{% block sidebar_role %}Admin Panel{% endblock %}
+{% block sidebar_nav %}{% include 'admin/_nav.html' %}{% endblock %}
+
+{% block content %}
+<!-- Summary Stats -->
+<div class="stats-grid mb-5">
+  <div class="stat-card stagger-1">
+    <div class="d-flex align-items-center justify-content-between">
+      <div><div class="stat-label">Active Students</div><div class="stat-number" data-count="{{ stats.total_students }}">0</div></div>
+      <div class="stat-icon stat-icon-blue"><i class="bi bi-people-fill"></i></div>
+    </div>
+  </div>
+  <div class="stat-card stagger-2">
+    <div class="d-flex align-items-center justify-content-between">
+      <div><div class="stat-label">Total Rooms</div><div class="stat-number" data-count="{{ stats.room_stats.total }}">0</div></div>
+      <div class="stat-icon stat-icon-teal"><i class="bi bi-building"></i></div>
+    </div>
+  </div>
+  <div class="stat-card stagger-3">
+    <div class="d-flex align-items-center justify-content-between">
+      <div><div class="stat-label">Available Rooms</div><div class="stat-number" data-count="{{ stats.room_stats.available }}">0</div></div>
+      <div class="stat-icon stat-icon-green"><i class="bi bi-door-open"></i></div>
+    </div>
+  </div>
+  <div class="stat-card stagger-4">
+    <div class="d-flex align-items-center justify-content-between">
+      <div><div class="stat-label">Pending Leaves</div><div class="stat-number" data-count="{{ stats.pending_leaves }}">0</div></div>
+      <div class="stat-icon stat-icon-amber"><i class="bi bi-calendar-minus"></i></div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-5 mb-5">
+  <!-- Room Occupancy Chart -->
+  <div class="col-lg-6 animate-fade-in-up stagger-1">
+    <div class="hms-card h-100">
+      <div class="hms-card-header">
+        <span class="hms-card-title"><i class="bi bi-bar-chart text-primary"></i> Room Occupancy by Type</span>
+      </div>
+      <div class="hms-card-body">
+        <div class="chart-container" style="min-height:260px;">
+          <canvas id="roomTypeChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Complaint Status Chart -->
+  <div class="col-lg-6 animate-fade-in-up stagger-2">
+    <div class="hms-card h-100">
+      <div class="hms-card-header">
+        <span class="hms-card-title"><i class="bi bi-pie-chart text-primary"></i> Complaint Status Distribution</span>
+      </div>
+      <div class="hms-card-body">
+        {% if complaint_chart %}
+        <div class="chart-container" style="min-height:260px;">
+          <canvas id="complaintReportChart"></canvas>
+        </div>
+        {% else %}
+        <div class="empty-state"><div class="empty-state-text">No complaint data</div></div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Students Table -->
+<div class="hms-card mb-5 animate-fade-in-up stagger-3">
+  <div class="hms-card-header">
+    <span class="hms-card-title"><i class="bi bi-people text-primary"></i> Student Report ({{ all_students|length }})</span>
+    <div class="hms-search" style="width:220px;">
+      <i class="bi bi-search hms-search-icon"></i>
+      <input type="text" class="hms-search-input" data-search-table="studRepTable" placeholder="Search…" style="width:100%;"/>
+    </div>
+  </div>
+  <div class="table-responsive-hms">
+    {% if all_students %}
+    <table class="hms-table" id="studRepTable">
+      <thead><tr><th>Name</th><th>Reg. No.</th><th>Department</th><th>Year</th><th>Status</th></tr></thead>
+      <tbody>
+      {% for s in all_students %}
+      <tr>
+        <td class="fw-600">{{ s.full_name }}<br><small style="color:var(--hms-text-muted);font-weight:400;">{{ s.email }}</small></td>
+        <td><code style="font-size:0.8rem;color:var(--hms-blue);">{{ s.registration_number }}</code></td>
+        <td>{{ s.department or '—' }}</td>
+        <td>{{ s.academic_year or '—' }}</td>
+        <td><span class="badge-hms badge-{{ s.account_status }}">{{ s.account_status|capitalize }}</span></td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state"><div class="empty-state-text">No students found</div></div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Rooms Table -->
+<div class="hms-card animate-fade-in-up stagger-4">
+  <div class="hms-card-header">
+    <span class="hms-card-title"><i class="bi bi-building text-primary"></i> Room Report ({{ all_rooms|length }})</span>
+  </div>
+  <div class="table-responsive-hms">
+    {% if all_rooms %}
+    <table class="hms-table">
+      <thead><tr><th>Room</th><th>Floor</th><th>Type</th><th>Capacity</th><th>Occupied</th><th>Occupancy</th><th>Status</th></tr></thead>
+      <tbody>
+      {% for r in all_rooms %}
+      {% set pct = ((r.occupied_count / r.capacity) * 100)|int if r.capacity > 0 else 0 %}
+      <tr>
+        <td class="fw-700">Room {{ r.room_number }}</td>
+        <td>Floor {{ r.floor }}</td>
+        <td>{{ r.room_type }}</td>
+        <td>{{ r.capacity }}</td>
+        <td>{{ r.occupied_count }}</td>
+        <td style="min-width:120px;">
+          <div class="d-flex align-items-center gap-2">
+            <div class="hms-progress" style="flex:1;height:5px;">
+              <div class="hms-progress-bar" data-progress="{{ pct }}" style="width:0%;"></div>
+            </div>
+            <span style="font-size:0.75rem;font-weight:600;min-width:30px;">{{ pct }}%</span>
+          </div>
+        </td>
+        <td><span class="badge-hms badge-{{ r.status.lower() }}">{{ r.status }}</span></td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state"><div class="empty-state-text">No rooms found</div></div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+/* Room type chart */
+(function() {
+  const rooms = {{ all_rooms | tojson }};
+  const typeCounts = {};
+  rooms.forEach(r => { typeCounts[r.room_type] = (typeCounts[r.room_type]||0) + r.occupied_count; });
+  const labels = Object.keys(typeCounts);
+  const data   = Object.values(typeCounts);
+  const ctx = document.getElementById('roomTypeChart');
+  if (ctx && labels.length) {
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Occupied Beds',
+          data,
+          backgroundColor: ['rgba(37,99,235,0.7)','rgba(20,184,166,0.7)','rgba(124,58,237,0.7)','rgba(247,144,9,0.7)'],
+          borderRadius: 6,
+          borderSkipped: false,
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ` ${c.raw} occupied` } } },
+        scales: {
+          y: { beginAtZero: true, grid: { color: '#F0F2F5' }, ticks: { color: '#667085' } },
+          x: { grid: { display: false }, ticks: { color: '#667085' } }
+        },
+        animation: { duration: 1000 }
+      }
+    });
+  }
+})();
+
+/* Complaint chart */
+{% if complaint_chart %}
+(function() {
+  const labels = {{ complaint_chart | map(attribute='status') | list | tojson }};
+  const data   = {{ complaint_chart | map(attribute='cnt')    | list | tojson }};
+  const ctx = document.getElementById('complaintReportChart');
+  if (ctx) {
+    new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels,
+        datasets: [{
+          data,
+          backgroundColor: ['#DBEAFE','#FEF3C7','#D1FAE5','#F3F4F6'],
+          borderColor: ['#2563EB','#F79009','#12B76A','#9CA3AF'],
+          borderWidth: 2,
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom' } },
+        animation: { animateScale: true, animateRotate: true, duration: 1000 }
+      }
+    });
+  }
+})();
+{% endif %}
+</script>
+{% endblock %}

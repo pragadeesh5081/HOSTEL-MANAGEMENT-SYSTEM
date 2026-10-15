@@ -1,0 +1,58 @@
+{% extends "layouts/dashboard.html" %}
+{% block title %}Leave History — HMS{% endblock %}
+{% block page_title %}Leave History{% endblock %}
+{% block sidebar_role %}Student Portal{% endblock %}
+{% block sidebar_nav %}{% include 'student/_nav.html' %}{% endblock %}
+
+{% block topbar_actions %}
+<a href="{{ url_for('student.apply_leave') }}" class="btn-hms-primary" style="padding:0.45rem 1rem;font-size:0.82rem;">
+  <i class="bi bi-plus-lg me-1"></i> Apply Leave
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="hms-card animate-fade-in-up">
+  <div class="hms-card-header">
+    <span class="hms-card-title"><i class="bi bi-calendar-check text-primary"></i> Leave Applications</span>
+    <div class="hms-search" style="width:220px;">
+      <i class="bi bi-search hms-search-icon"></i>
+      <input type="text" class="hms-search-input" data-search-table="leaveTable" placeholder="Search…" style="width:100%;"/>
+    </div>
+  </div>
+  <div class="table-responsive-hms">
+    {% if leaves %}
+    <table class="hms-table" id="leaveTable">
+      <thead>
+        <tr>
+          <th>#</th><th>Dates</th><th>Destination</th><th>Reason</th><th>Status</th><th>Remarks</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for l in leaves %}
+      <tr>
+        <td style="color:var(--hms-text-muted);">{{ loop.index }}</td>
+        <td>
+          <div class="fw-600" style="font-size:0.82rem;">{{ l.start_date }}</div>
+          <div style="font-size:0.75rem;color:var(--hms-text-muted);">to {{ l.end_date }}</div>
+        </td>
+        <td>{{ l.destination }}</td>
+        <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="{{ l.reason }}">{{ l.reason }}</td>
+        <td>
+          <span class="badge-hms badge-{{ l.status.lower() }}">{{ l.status }}</span>
+        </td>
+        <td style="font-size:0.8rem;color:var(--hms-text-muted);">{{ l.admin_remarks or '—' }}</td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-state-icon"><i class="bi bi-calendar-x"></i></div>
+      <div class="empty-state-title">No leave applications</div>
+      <div class="empty-state-text">You haven't applied for any leave yet.</div>
+      <a href="{{ url_for('student.apply_leave') }}" class="btn-hms-primary mt-3">Apply Now</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

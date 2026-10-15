@@ -1,0 +1,60 @@
+{% extends "layouts/dashboard.html" %}
+{% block title %}Submit Complaint — HMS{% endblock %}
+{% block page_title %}Submit Complaint{% endblock %}
+{% block sidebar_role %}Student Portal{% endblock %}
+{% block sidebar_nav %}{% include 'student/_nav.html' %}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center animate-fade-in-up">
+  <div class="col-lg-7">
+    <div class="hms-card">
+      <div class="hms-card-header">
+        <span class="hms-card-title"><i class="bi bi-chat-left-text text-primary"></i> New Complaint</span>
+      </div>
+      <div class="hms-card-body">
+        <form method="POST" action="{{ url_for('student.submit_complaint') }}" novalidate>
+          <div class="row g-4">
+            <div class="col-12">
+              <label class="form-label fw-600" style="font-size:0.85rem;">Title *</label>
+              <input type="text" name="title" class="hms-input" required maxlength="200"
+                     placeholder="Brief description of the issue"
+                     value="{{ request.form.get('title','') }}"/>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-600" style="font-size:0.85rem;">Category *</label>
+              <select name="category" class="hms-input filter-select" required style="padding:0.65rem 1rem;">
+                <option value="" disabled {% if not request.form.get('category') %}selected{% endif %}>Select category</option>
+                {% for cat in ['Maintenance','Electricity','Water','Cleanliness','Food','Other'] %}
+                <option value="{{ cat }}" {% if request.form.get('category')==cat %}selected{% endif %}>{{ cat }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-600" style="font-size:0.85rem;">Priority</label>
+              <select name="priority" class="hms-input filter-select" style="padding:0.65rem 1rem;">
+                {% for p in ['Low','Medium','High','Urgent'] %}
+                <option value="{{ p }}" {% if request.form.get('priority',p)=='Medium' and p=='Medium' %}selected{% elif request.form.get('priority')==p %}selected{% endif %}>{{ p }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-600" style="font-size:0.85rem;">Description *</label>
+              <textarea name="description" class="hms-input" rows="4" required
+                        placeholder="Provide a detailed description of the issue">{{ request.form.get('description','') }}</textarea>
+            </div>
+            <div class="col-12 d-flex gap-3">
+              <button type="submit" class="btn-hms-primary" data-loading>
+                <span class="btn-text"><i class="bi bi-send me-1"></i> Submit Complaint</span>
+                <span class="btn-spinner"></span>
+              </button>
+              <a href="{{ url_for('student.my_complaints') }}" class="btn-hms-outline">
+                <i class="bi bi-list-check me-1"></i> My Complaints
+              </a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

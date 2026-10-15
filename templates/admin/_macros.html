@@ -1,0 +1,19 @@
+{# Admin Sidebar Navigation Macro #}
+{% macro admin_nav(active='') %}
+<div class="nav-section-label">Overview</div>
+<div class="nav-item"><a href="{{ url_for('admin.dashboard') }}" class="nav-link {% if active=='dashboard' %}active{% endif %}"><i class="bi bi-grid-1x2 nav-icon"></i><span class="nav-text">Dashboard</span></a></div>
+<div class="nav-section-label" style="margin-top:8px;">Students</div>
+<div class="nav-item"><a href="{{ url_for('admin.students') }}" class="nav-link {% if active=='students' %}active{% endif %}"><i class="bi bi-people nav-icon"></i><span class="nav-text">Students</span></a></div>
+<div class="nav-section-label" style="margin-top:8px;">Rooms</div>
+<div class="nav-item"><a href="{{ url_for('admin.rooms') }}" class="nav-link {% if active=='rooms' %}active{% endif %}"><i class="bi bi-building nav-icon"></i><span class="nav-text">Rooms</span></a></div>
+<div class="nav-item"><a href="{{ url_for('admin.allocations') }}" class="nav-link {% if active=='allocations' %}active{% endif %}"><i class="bi bi-door-closed nav-icon"></i><span class="nav-text">Allocations</span></a></div>
+<div class="nav-item"><a href="{{ url_for('admin.room_change_requests') }}" class="nav-link {% if active=='change' %}active{% endif %}"><i class="bi bi-arrow-left-right nav-icon"></i><span class="nav-text">Change Requests</span></a></div>
+<div class="nav-section-label" style="margin-top:8px;">Applications</div>
+<div class="nav-item"><a href="{{ url_for('admin.leave_requests') }}" class="nav-link {% if active=='leave' %}active{% endif %}"><i class="bi bi-calendar-week nav-icon"></i><span class="nav-text">Leave Requests</span></a></div>
+<div class="nav-item"><a href="{{ url_for('admin.complaints') }}" class="nav-link {% if active=='complaints' %}active{% endif %}"><i class="bi bi-chat-square-dots nav-icon"></i><span class="nav-text">Complaints</span></a></div>
+<div class="nav-section-label" style="margin-top:8px;">Content</div>
+<div class="nav-item"><a href="{{ url_for('admin.announcements') }}" class="nav-link {% if active=='announcements' %}active{% endif %}"><i class="bi bi-megaphone nav-icon"></i><span class="nav-text">Announcements</span></a></div>
+<div class="nav-item"><a href="{{ url_for('admin.reports') }}" class="nav-link {% if active=='reports' %}active{% endif %}"><i class="bi bi-bar-chart-line nav-icon"></i><span class="nav-text">Reports</span></a></div>
+<div class="nav-section-label" style="margin-top:8px;">Account</div>
+<div class="nav-item"><a href="{{ url_for('auth.logout') }}" class="nav-link"><i class="bi bi-box-arrow-right nav-icon"></i><span class="nav-text">Logout</span></a></div>
+{% endmacro %}

@@ -1,0 +1,118 @@
+{% extends "layouts/dashboard.html" %}
+{% block title %}Leave Requests — HMS{% endblock %}
+{% block page_title %}Leave Requests{% endblock %}
+{% block sidebar_role %}Admin Panel{% endblock %}
+{% block sidebar_nav %}{% include 'admin/_nav.html' %}{% endblock %}
+
+{% block content %}
+<div class="hms-card animate-fade-in-up">
+  <div class="hms-card-header">
+    <span class="hms-card-title"><i class="bi bi-calendar-week text-primary"></i> All Leave Requests</span>
+    <div class="d-flex gap-2 align-items-center">
+      <select class="filter-select" data-filter-table="leaveTable" data-filter-col="4">
+        <option value="">All Status</option>
+        <option value="pending">Pending</option>
+        <option value="approved">Approved</option>
+        <option value="rejected">Rejected</option>
+      </select>
+      <div class="hms-search" style="width:200px;">
+        <i class="bi bi-search hms-search-icon"></i>
+        <input type="text" class="hms-search-input" data-search-table="leaveTable" placeholder="Search…" style="width:100%;"/>
+      </div>
+    </div>
+  </div>
+  <div class="table-responsive-hms">
+    {% if leaves %}
+    <table class="hms-table" id="leaveTable">
+      <thead>
+        <tr><th>Student</th><th>Dates</th><th>Destination</th><th>Emergency Contact</th><th>Status</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+      {% for l in leaves %}
+      <tr>
+        <td>
+          <div class="fw-600" style="font-size:0.85rem;">{{ l.full_name }}</div>
+          <div style="font-size:0.75rem;color:var(--hms-text-muted);">{{ l.registration_number }}</div>
+        </td>
+        <td>
+          <div style="font-size:0.82rem;">{{ l.start_date }}</div>
+          <div style="font-size:0.75rem;color:var(--hms-text-muted);">→ {{ l.end_date }}</div>
+        </td>
+        <td style="font-size:0.85rem;">{{ l.destination }}</td>
+        <td style="font-size:0.82rem;">{{ l.emergency_contact }}</td>
+        <td><span class="badge-hms badge-{{ l.status.lower() }}">{{ l.status }}</span></td>
+        <td>
+          {% if l.status == 'Pending' %}
+          <!-- Review Modal Trigger -->
+          <button type="button" class="btn-hms-primary" style="padding:3px 10px;font-size:0.78rem;"
+                  data-bs-toggle="modal" data-bs-target="#reviewModal{{ l.leave_id }}">
+            Review
+          </button>
+          {% else %}
+          <div style="font-size:0.78rem;color:var(--hms-text-muted);">
+            {{ l.admin_remarks or '—' }}<br>
+            <span style="font-size:0.72rem;">{{ l.reviewed_at|format_date('%b %d') }}</span>
+          </div>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-state-icon"><i class="bi bi-calendar-x"></i></div>
+      <div class="empty-state-title">No leave requests</div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block modals %}
+<!-- Review Modals placed outside main container at root body level -->
+{% if leaves %}
+  {% for l in leaves %}
+    {% if l.status == 'Pending' %}
+    <div class="modal fade" id="reviewModal{{ l.leave_id }}" tabindex="-1" aria-labelledby="reviewModalLabel{{ l.leave_id }}" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" style="max-width: 500px;">
+        <div class="modal-content" style="background:#ffffff; border-radius:16px; border:1px solid var(--hms-border); box-shadow:0 25px 50px -12px rgba(0,0,0,0.35);">
+          <div class="modal-header" style="border-bottom:1px solid var(--hms-border); padding:1.1rem 1.5rem; background:#ffffff; border-top-left-radius:16px; border-top-right-radius:16px;">
+            <h5 class="modal-title fw-700" id="reviewModalLabel{{ l.leave_id }}" style="font-size:1.1rem; color:var(--hms-text);">Review Leave — {{ l.full_name }}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <form method="POST" action="{{ url_for('admin.review_leave', leave_id=l.leave_id) }}">
+            <div class="modal-body" style="padding:1.5rem; background:#ffffff;">
+              <div class="p-3 rounded-3 mb-3" style="background:var(--hms-bg); font-size:0.875rem; border:1px solid var(--hms-border); color:var(--hms-text);">
+                <div class="mb-1"><strong>Period:</strong> {{ l.start_date }} → {{ l.end_date }}</div>
+                <div class="mb-1"><strong>Destination:</strong> {{ l.destination }}</div>
+                <div><strong>Reason:</strong> {{ l.reason }}</div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-600" style="font-size:0.85rem; color:var(--hms-text);">Decision *</label>
+                <select name="decision" class="hms-input filter-select" required style="padding:0.6rem 1rem; width:100%; display:block;">
+                  <option value="Approved">Approve</option>
+                  <option value="Rejected">Reject</option>
+                </select>
+              </div>
+              <div>
+                <label class="form-label fw-600" style="font-size:0.85rem; color:var(--hms-text);">Admin Remarks</label>
+                <textarea name="admin_remarks" class="hms-input" rows="2" placeholder="Optional remarks…" style="width:100%;"></textarea>
+              </div>
+            </div>
+            <div class="modal-footer" style="border-top:1px solid var(--hms-border); padding:0.85rem 1.5rem; background:#ffffff; border-bottom-left-radius:16px; border-bottom-right-radius:16px;">
+              <button type="button" class="btn-hms-outline" data-bs-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn-hms-primary" data-loading>
+                <span class="btn-text">Submit Decision</span>
+                <span class="btn-spinner"></span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  {% endfor %}
+{% endif %}
+{% endblock %}
+

@@ -1,0 +1,117 @@
+/* main.css — global styles layered on top of Bootstrap & animations */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+  background: var(--hms-bg);
+  color: var(--hms-text);
+  margin: 0; padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #CBD5E0; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #A0AEC0; }
+
+a { color: var(--hms-blue); }
+a:hover { color: var(--hms-blue-light); }
+
+/* Override Bootstrap primary */
+.btn-primary { background: var(--hms-blue); border-color: var(--hms-blue); }
+.btn-primary:hover, .btn-primary:focus { background: #1D4ED8; border-color: #1D4ED8; }
+
+/* Grid utilities */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-5);
+}
+.room-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--space-5);
+}
+
+/* Section spacing */
+.section-gap { margin-bottom: var(--space-8); }
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: var(--space-12) var(--space-6);
+  color: var(--hms-text-muted);
+}
+.empty-state-icon { font-size: 3rem; margin-bottom: var(--space-4); opacity: 0.35; }
+.empty-state-title { font-size: 1rem; font-weight: 600; color: var(--hms-text); margin-bottom: var(--space-2); }
+.empty-state-text  { font-size: 0.875rem; }
+
+/* Divider */
+.hms-divider { border: none; border-top: 1px solid var(--hms-border); margin: var(--space-6) 0; }
+
+/* Filter bar */
+.filter-bar {
+  display: flex; align-items: center; gap: var(--space-3);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-5);
+}
+.filter-select {
+  border: 1.5px solid var(--hms-border);
+  border-radius: var(--radius-sm);
+  padding: 0.45rem 2rem 0.45rem 0.75rem;
+  font-size: 0.875rem;
+  background: var(--hms-surface);
+  outline: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23667085' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  cursor: pointer;
+  transition: border-color var(--dur-fast);
+}
+.filter-select:focus { border-color: var(--hms-blue); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+
+/* Topbar actions */
+.topbar-actions { display: flex; align-items: center; gap: var(--space-3); }
+.topbar-avatar {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--hms-blue), var(--hms-teal));
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-weight: 700; font-size: 0.85rem;
+  cursor: pointer;
+}
+
+/* Confirmation delete button */
+.btn-danger-sm {
+  background: #FEF2F2; color: var(--hms-danger);
+  border: 1px solid #FECACA;
+  border-radius: var(--radius-xs);
+  padding: 4px 10px; font-size: 0.78rem; font-weight: 600;
+  cursor: pointer; transition: all var(--dur-fast);
+}
+.btn-danger-sm:hover { background: var(--hms-danger); color: #fff; }
+
+/* Chart containers */
+.chart-container { position: relative; min-height: 220px; }
+
+/* Pagination */
+.hms-pagination { display: flex; gap: 4px; align-items: center; }
+.hms-pagination .page-btn {
+  width: 32px; height: 32px;
+  border: 1px solid var(--hms-border);
+  border-radius: var(--radius-xs);
+  background: var(--hms-surface);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 0.8rem; color: var(--hms-text-muted);
+  transition: all var(--dur-fast);
+}
+.hms-pagination .page-btn:hover, .hms-pagination .page-btn.active {
+  background: var(--hms-blue); color: #fff; border-color: var(--hms-blue);
+}
+
+/* Responsive table wrapper */
+.table-responsive-hms { overflow-x: auto; border-radius: var(--radius-md); }

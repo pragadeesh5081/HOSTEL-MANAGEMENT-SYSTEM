@@ -1,0 +1,67 @@
+{% extends "layouts/dashboard.html" %}
+{% block title %}Manage Students — HMS{% endblock %}
+{% block page_title %}Manage Students{% endblock %}
+{% block sidebar_role %}Admin Panel{% endblock %}
+{% block sidebar_nav %}{% include 'admin/_nav.html' %}{% endblock %}
+{% block topbar_actions %}
+<a href="{{ url_for('admin.add_student') }}" class="btn-hms-primary" style="padding:0.45rem 1rem;font-size:0.82rem;">
+  <i class="bi bi-person-plus me-1"></i> Add Student
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="hms-card animate-fade-in-up">
+  <div class="hms-card-header">
+    <span class="hms-card-title"><i class="bi bi-people text-primary"></i> All Students ({{ students|length }})</span>
+    <div class="hms-search" style="width:240px;">
+      <i class="bi bi-search hms-search-icon"></i>
+      <input type="text" class="hms-search-input" data-search-table="studentsTable" placeholder="Search students…" style="width:100%;"/>
+    </div>
+  </div>
+  <div class="table-responsive-hms">
+    {% if students %}
+    <table class="hms-table" id="studentsTable">
+      <thead>
+        <tr><th>Student</th><th>Reg. No.</th><th>Department</th><th>Year</th><th>Phone</th><th>Status</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+      {% for s in students %}
+      <tr>
+        <td>
+          <div class="d-flex align-items-center gap-2">
+            <div style="width:30px;height:30px;background:linear-gradient(135deg,var(--hms-blue),var(--hms-teal));border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:0.75rem;font-weight:700;flex-shrink:0;">{{ s.full_name[0]|upper }}</div>
+            <div>
+              <div class="fw-600" style="font-size:0.85rem;">{{ s.full_name }}</div>
+              <div style="font-size:0.75rem;color:var(--hms-text-muted);">{{ s.email }}</div>
+            </div>
+          </div>
+        </td>
+        <td><code style="font-size:0.8rem;color:var(--hms-blue);">{{ s.registration_number }}</code></td>
+        <td>{{ s.department or '—' }}</td>
+        <td>{{ s.academic_year or '—' }}</td>
+        <td>{{ s.phone or '—' }}</td>
+        <td><span class="badge-hms badge-{{ s.account_status }}">{{ s.account_status|capitalize }}</span></td>
+        <td>
+          <div class="d-flex gap-2">
+            <a href="{{ url_for('admin.edit_student', student_id=s.student_id) }}" class="btn-hms-outline" style="padding:3px 10px;font-size:0.78rem;">Edit</a>
+            <form method="POST" action="{{ url_for('admin.toggle_student_status', student_id=s.student_id) }}" style="display:inline;">
+              <button type="submit" class="btn-danger-sm" data-confirm="Toggle status for {{ s.full_name }}?">
+                {{ 'Deactivate' if s.account_status=='active' else 'Activate' }}
+              </button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-state-icon"><i class="bi bi-people"></i></div>
+      <div class="empty-state-title">No students found</div>
+      <a href="{{ url_for('admin.add_student') }}" class="btn-hms-primary mt-3">Add First Student</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

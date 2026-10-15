@@ -1,0 +1,206 @@
+{% extends "auth/login.html" %}
+{% block title %}Register — Hostel Management System{% endblock %}
+
+{% block body %}
+<div class="login-bg">
+  <div class="ambient amb-1"></div>
+  <div class="ambient amb-2"></div>
+  <div class="ambient amb-3"></div>
+
+  <!-- Floating particles -->
+  <div class="particles">
+    <div class="particle" style="width:6px;height:6px;left:10%;top:20%;--dur:6s;--delay:0s;"></div>
+    <div class="particle" style="width:4px;height:4px;left:25%;top:60%;--dur:8s;--delay:1s;"></div>
+    <div class="particle" style="width:8px;height:8px;left:70%;top:15%;--dur:7s;--delay:2s;"></div>
+    <div class="particle" style="width:5px;height:5px;left:80%;top:70%;--dur:9s;--delay:0.5s;"></div>
+    <div class="particle" style="width:3px;height:3px;left:45%;top:80%;--dur:5s;--delay:1.5s;"></div>
+    <div class="particle" style="width:7px;height:7px;left:90%;top:40%;--dur:6.5s;--delay:3s;"></div>
+    <div class="particle" style="width:4px;height:4px;left:5%;top:85%;--dur:8s;--delay:2.5s;"></div>
+    <div class="particle" style="width:6px;height:6px;left:55%;top:30%;--dur:7.5s;--delay:1s;"></div>
+  </div>
+
+  <div class="login-card" style="max-width:540px; max-height:92vh; overflow-y:auto;">
+    <div class="login-logo" id="regLogo">H</div>
+    <h1 class="login-title" id="regTitle" style="font-size:1.35rem;">Create Account</h1>
+    <p class="login-sub" id="regSubtitle" style="margin-bottom: 1.25rem;">Register as a hostel student</p>
+
+    <!-- Role Selector Tabs -->
+    <div class="role-tabs" id="regRoleTabs">
+      <button type="button" class="role-tab {% if request.form.get('role', request.args.get('role', 'student')) == 'student' %}active{% endif %}" data-role="student" id="tabStudent">
+        <i class="bi bi-mortarboard"></i> Student
+      </button>
+      <button type="button" class="role-tab {% if request.form.get('role', request.args.get('role')) == 'admin' %}active{% endif %}" data-role="admin" id="tabAdmin">
+        <i class="bi bi-shield-lock"></i> Admin
+      </button>
+    </div>
+
+    {% if error %}
+    <div class="login-error"><i class="bi bi-exclamation-circle-fill"></i> {{ error }}</div>
+    {% endif %}
+
+    <form method="POST" action="{{ url_for('auth.register') }}" novalidate id="regForm">
+      <input type="hidden" name="role" id="roleInput" value="{{ request.form.get('role', request.args.get('role', 'student')) }}"/>
+
+      <div class="row g-3">
+        <div class="col-12">
+          <div class="fl-group mb-0">
+            <input type="text" name="full_name" class="fl-input" placeholder="Full Name" required
+                   value="{{ request.form.get('full_name','') }}"/>
+            <label class="fl-label">Full Name *</label>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="fl-group mb-0">
+            <input type="email" name="email" class="fl-input" placeholder="Email" required
+                   value="{{ request.form.get('email','') }}"/>
+            <label class="fl-label">Email *</label>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="fl-group mb-0">
+            <input type="tel" name="phone" class="fl-input" placeholder="Phone"
+                   value="{{ request.form.get('phone','') }}"/>
+            <label class="fl-label">Phone</label>
+          </div>
+        </div>
+
+        <!-- Student-only fields -->
+        <div id="studentFields" class="row g-3 m-0 p-0" style="{% if request.form.get('role', request.args.get('role', 'student')) == 'admin' %}display: none;{% endif %}">
+          <div class="col-12">
+            <div class="fl-group mb-0">
+              <input type="text" name="registration_number" id="regNumberInput" class="fl-input" placeholder="Reg Number"
+                     value="{{ request.form.get('registration_number','') }}"/>
+              <label class="fl-label">Registration Number *</label>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="fl-group mb-0">
+              <input type="text" name="department" class="fl-input" placeholder="Department"
+                     value="{{ request.form.get('department','') }}"/>
+              <label class="fl-label">Department</label>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="fl-group mb-0">
+              <input type="text" name="academic_year" class="fl-input" placeholder="Academic Year"
+                     value="{{ request.form.get('academic_year','') }}"/>
+              <label class="fl-label">Academic Year</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Password fields -->
+        <div class="col-md-6">
+          <div class="fl-group mb-0 pw-wrapper">
+            <input type="password" name="password" id="regPw" class="fl-input" placeholder="Password" required/>
+            <label class="fl-label">Password *</label>
+            <button type="button" class="pw-toggle" onclick="togglePw('regPw','icon1')">
+              <i class="bi bi-eye" id="icon1"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="fl-group mb-0 pw-wrapper">
+            <input type="password" name="confirm_password" id="regPw2" class="fl-input" placeholder="Confirm Password" required/>
+            <label class="fl-label">Confirm Password *</label>
+            <button type="button" class="pw-toggle" onclick="togglePw('regPw2','icon2')">
+              <i class="bi bi-eye" id="icon2"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="col-12 mt-3">
+          <button type="submit" class="login-btn {% if request.form.get('role', request.args.get('role')) == 'admin' %}login-btn-admin{% endif %}" id="regBtn">
+            <span class="btn-text" id="regBtnText">Create Student Account <i class="bi bi-arrow-right ms-1"></i></span>
+            <span class="btn-spinner" style="display:none;">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle; margin-right: 6px;">
+                <circle cx="9" cy="9" r="7" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+                <path d="M9 2a7 7 0 0 1 7 7" stroke="white" stroke-width="2" stroke-linecap="round">
+                  <animateTransform attributeName="transform" type="rotate" from="0 9 9" to="360 9 9" dur="0.8s" repeatCount="indefinite"/>
+                </path>
+              </svg>
+              Creating account…
+            </span>
+          </button>
+        </div>
+      </div>
+    </form>
+
+    <div class="login-footer-link">
+      Already have an account? <a href="{{ url_for('auth.login') }}" id="loginAnchor">Sign in</a>
+    </div>
+  </div>
+</div>
+
+<script>
+function togglePw(inputId, iconId) {
+  const input = document.getElementById(inputId);
+  const icon  = document.getElementById(iconId);
+  const isText = input.type === 'text';
+  input.type = isText ? 'password' : 'text';
+  icon.className = isText ? 'bi bi-eye' : 'bi bi-eye-slash';
+}
+
+/* ── Role Switching on Register Page ── */
+const regTabs        = document.querySelectorAll('#regRoleTabs .role-tab');
+const roleInput      = document.getElementById('roleInput');
+const studentFields  = document.getElementById('studentFields');
+const regNumberInput = document.getElementById('regNumberInput');
+const regBtn         = document.getElementById('regBtn');
+const regBtnText     = document.getElementById('regBtnText');
+const regSubtitle    = document.getElementById('regSubtitle');
+const regTitle       = document.getElementById('regTitle');
+const loginAnchor    = document.getElementById('loginAnchor');
+const regLogo        = document.getElementById('regLogo');
+
+function applyRegisterRole(role) {
+  roleInput.value = role;
+  regTabs.forEach(t => {
+    t.classList.toggle('active', t.dataset.role === role);
+  });
+
+  if (role === 'admin') {
+    studentFields.style.display = 'none';
+    regNumberInput.required = false;
+    regNumberInput.disabled = true;
+    regBtn.classList.add('login-btn-admin');
+    regBtnText.innerHTML = 'Create Admin Account <i class="bi bi-shield-check ms-1"></i>';
+    regTitle.textContent = 'Admin Registration';
+    regSubtitle.textContent = 'Register as a hostel administrator';
+    if (loginAnchor) loginAnchor.href = "{{ url_for('auth.login') }}?role=admin";
+    if (regLogo) regLogo.style.background = 'linear-gradient(135deg, #7C3AED, #DB2777)';
+  } else {
+    studentFields.style.display = '';
+    regNumberInput.required = true;
+    regNumberInput.disabled = false;
+    regBtn.classList.remove('login-btn-admin');
+    regBtnText.innerHTML = 'Create Student Account <i class="bi bi-arrow-right ms-1"></i>';
+    regTitle.textContent = 'Create Account';
+    regSubtitle.textContent = 'Register as a hostel student';
+    if (loginAnchor) loginAnchor.href = "{{ url_for('auth.login') }}?role=student";
+    if (regLogo) regLogo.style.background = 'linear-gradient(135deg, #2563EB, #14B8A6)';
+  }
+}
+
+regTabs.forEach(tab => {
+  tab.addEventListener('click', () => applyRegisterRole(tab.dataset.role));
+});
+
+/* Initialize role state */
+applyRegisterRole(roleInput.value || 'student');
+
+const regForm = document.getElementById('regForm');
+if (regForm) {
+  regForm.addEventListener('submit', () => {
+    regBtn.disabled = true;
+    regBtn.querySelector('.btn-text').style.display = 'none';
+    regBtn.querySelector('.btn-spinner').style.display = 'flex';
+  });
+}
+</script>
+{% endblock %}

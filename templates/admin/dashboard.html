@@ -1,0 +1,231 @@
+{% extends "layouts/dashboard.html" %}
+{% block title %}Admin Dashboard — HMS{% endblock %}
+{% block page_title %}Admin Dashboard{% endblock %}
+{% block sidebar_role %}Admin Panel{% endblock %}
+
+{% block sidebar_nav %}
+<div class="nav-section-label">Overview</div>
+<div class="nav-item"><a href="{{ url_for('admin.dashboard') }}" class="nav-link {% if request.endpoint=='admin.dashboard' %}active{% endif %}"><i class="bi bi-grid-1x2 nav-icon"></i><span class="nav-text">Dashboard</span></a></div>
+<div class="nav-section-label" style="margin-top:8px;">Students</div>
+<div class="nav-item"><a href="{{ url_for('admin.students') }}" class="nav-link {% if 'student' in request.endpoint %}active{% endif %}"><i class="bi bi-people nav-icon"></i><span class="nav-text">Students</span></a></div>
+<div class="nav-section-label" style="margin-top:8px;">Rooms</div>
+<div class="nav-item"><a href="{{ url_for('admin.rooms') }}" class="nav-link {% if request.endpoint in ['admin.rooms','admin.add_room','admin.edit_room'] %}active{% endif %}"><i class="bi bi-building nav-icon"></i><span class="nav-text">Rooms</span></a></div>
+<div class="nav-item"><a href="{{ url_for('admin.allocations') }}" class="nav-link {% if request.endpoint=='admin.allocations' %}active{% endif %}"><i class="bi bi-door-closed nav-icon"></i><span class="nav-text">Allocations</span></a></div>
+<div class="nav-item"><a href="{{ url_for('admin.room_change_requests') }}" class="nav-link {% if request.endpoint=='admin.room_change_requests' %}active{% endif %}"><i class="bi bi-arrow-left-right nav-icon"></i><span class="nav-text">Change Requests</span></a></div>
+<div class="nav-section-label" style="margin-top:8px;">Applications</div>
+<div class="nav-item"><a href="{{ url_for('admin.leave_requests') }}" class="nav-link {% if request.endpoint=='admin.leave_requests' %}active{% endif %}"><i class="bi bi-calendar-week nav-icon"></i><span class="nav-text">Leave Requests</span></a></div>
+<div class="nav-item"><a href="{{ url_for('admin.complaints') }}" class="nav-link {% if request.endpoint=='admin.complaints' %}active{% endif %}"><i class="bi bi-chat-square-dots nav-icon"></i><span class="nav-text">Complaints</span></a></div>
+<div class="nav-section-label" style="margin-top:8px;">Content</div>
+<div class="nav-item"><a href="{{ url_for('admin.announcements') }}" class="nav-link {% if 'announcement' in request.endpoint %}active{% endif %}"><i class="bi bi-megaphone nav-icon"></i><span class="nav-text">Announcements</span></a></div>
+<div class="nav-item"><a href="{{ url_for('admin.reports') }}" class="nav-link {% if request.endpoint=='admin.reports' %}active{% endif %}"><i class="bi bi-bar-chart-line nav-icon"></i><span class="nav-text">Reports</span></a></div>
+<div class="nav-section-label" style="margin-top:8px;">Account</div>
+<div class="nav-item"><a href="{{ url_for('auth.logout') }}" class="nav-link"><i class="bi bi-box-arrow-right nav-icon"></i><span class="nav-text">Logout</span></a></div>
+{% endblock %}
+
+{% block content %}
+<!-- Stats Grid -->
+<div class="stats-grid mb-5">
+  <div class="stat-card stagger-1">
+    <div class="d-flex align-items-center justify-content-between">
+      <div>
+        <div class="stat-label">Total Students</div>
+        <div class="stat-number" data-count="{{ stats.total_students }}">0</div>
+      </div>
+      <div class="stat-icon stat-icon-blue"><i class="bi bi-people-fill"></i></div>
+    </div>
+  </div>
+  <div class="stat-card stagger-2">
+    <div class="d-flex align-items-center justify-content-between">
+      <div>
+        <div class="stat-label">Total Rooms</div>
+        <div class="stat-number" data-count="{{ stats.room_stats.total }}">0</div>
+      </div>
+      <div class="stat-icon stat-icon-teal"><i class="bi bi-building"></i></div>
+    </div>
+  </div>
+  <div class="stat-card stagger-3">
+    <div class="d-flex align-items-center justify-content-between">
+      <div>
+        <div class="stat-label">Available Rooms</div>
+        <div class="stat-number" data-count="{{ stats.room_stats.available }}">0</div>
+      </div>
+      <div class="stat-icon stat-icon-green"><i class="bi bi-door-open"></i></div>
+    </div>
+  </div>
+  <div class="stat-card stagger-4">
+    <div class="d-flex align-items-center justify-content-between">
+      <div>
+        <div class="stat-label">Full Rooms</div>
+        <div class="stat-number" data-count="{{ stats.room_stats.full_rooms }}">0</div>
+      </div>
+      <div class="stat-icon stat-icon-red"><i class="bi bi-door-closed"></i></div>
+    </div>
+  </div>
+  <div class="stat-card stagger-5">
+    <div class="d-flex align-items-center justify-content-between">
+      <div>
+        <div class="stat-label">Pending Changes</div>
+        <div class="stat-number" data-count="{{ stats.pending_changes }}">0</div>
+      </div>
+      <div class="stat-icon stat-icon-teal"><i class="bi bi-arrow-left-right"></i></div>
+    </div>
+  </div>
+  <div class="stat-card stagger-6">
+    <div class="d-flex align-items-center justify-content-between">
+      <div>
+        <div class="stat-label">Pending Leaves</div>
+        <div class="stat-number" data-count="{{ stats.pending_leaves }}">0</div>
+      </div>
+      <div class="stat-icon stat-icon-amber"><i class="bi bi-calendar-minus"></i></div>
+    </div>
+  </div>
+  <div class="stat-card stagger-7">
+    <div class="d-flex align-items-center justify-content-between">
+      <div>
+        <div class="stat-label">Open Complaints</div>
+        <div class="stat-number" data-count="{{ stats.open_complaints }}">0</div>
+      </div>
+      <div class="stat-icon stat-icon-purple"><i class="bi bi-chat-square-dots-fill"></i></div>
+    </div>
+  </div>
+</div>
+
+<!-- Occupancy rate -->
+{% if stats.room_stats.total_capacity > 0 %}
+{% set occ_pct = ((stats.room_stats.occupied_beds / stats.room_stats.total_capacity) * 100)|int %}
+<div class="hms-card mb-5 animate-fade-in-up stagger-2">
+  <div class="hms-card-body">
+    <div class="d-flex align-items-center justify-content-between mb-2">
+      <span class="fw-600" style="font-size:0.9rem;">Overall Bed Occupancy</span>
+      <span class="fw-700" style="color:var(--hms-blue);">{{ occ_pct }}% ({{ stats.room_stats.occupied_beds }}/{{ stats.room_stats.total_capacity }} Beds)</span>
+    </div>
+    <div class="hms-progress" style="height:10px;">
+      <div class="hms-progress-bar" data-progress="{{ occ_pct }}" style="width:0%;"></div>
+    </div>
+    <div class="d-flex justify-content-between mt-1">
+      <small style="color:var(--hms-text-muted);">{{ stats.room_stats.occupied_beds }} occupied &nbsp;·&nbsp; {{ stats.room_stats.active_allocations }} active students</small>
+      <small style="color:var(--hms-text-muted);">{{ stats.room_stats.total_capacity - stats.room_stats.occupied_beds }} beds available &nbsp;·&nbsp; {{ stats.room_stats.available }} rooms available</small>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- Charts + Recent Activity -->
+<div class="row g-4 mb-4">
+  <!-- Recent Room Change Requests -->
+  <div class="col-lg-6 animate-fade-in-up stagger-2">
+    <div class="hms-card h-100">
+      <div class="hms-card-header">
+        <span class="hms-card-title"><i class="bi bi-arrow-left-right text-primary"></i> Room Change Requests</span>
+        <a href="{{ url_for('admin.room_change_requests') }}" class="btn btn-sm btn-hms-outline">View All</a>
+      </div>
+      <div class="table-responsive-hms">
+        {% if recent_changes %}
+        <table class="hms-table">
+          <thead><tr><th>Student</th><th>Exchange</th><th>Status</th></tr></thead>
+          <tbody>
+          {% for r in recent_changes %}
+          <tr>
+            <td class="fw-600">
+              {{ r.full_name }}<br>
+              <small style="color:var(--hms-text-muted);font-weight:400;">{{ r.registration_number }}</small>
+            </td>
+            <td>
+              <small>Room {{ r.current_room }} → <strong style="color:var(--hms-teal);">Room {{ r.requested_room }}</strong></small>
+            </td>
+            <td><span class="badge-hms badge-{{ r.status.lower() }}">{{ r.status }}</span></td>
+          </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state py-4"><div class="empty-state-text">No room change requests</div></div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Leave Requests -->
+  <div class="col-lg-6 animate-fade-in-up stagger-2">
+    <div class="hms-card h-100">
+      <div class="hms-card-header">
+        <span class="hms-card-title"><i class="bi bi-calendar-week text-primary"></i> Recent Leave Requests</span>
+        <a href="{{ url_for('admin.leave_requests') }}" class="btn btn-sm btn-hms-outline">View All</a>
+      </div>
+      <div class="table-responsive-hms">
+        {% if recent_leaves %}
+        <table class="hms-table">
+          <thead><tr><th>Student</th><th>Dates</th><th>Status</th></tr></thead>
+          <tbody>
+          {% for l in recent_leaves %}
+          <tr>
+            <td class="fw-600">{{ l.full_name }}<br><small style="color:var(--hms-text-muted);font-weight:400;">{{ l.registration_number }}</small></td>
+            <td><small>{{ l.start_date }} → {{ l.end_date }}</small></td>
+            <td><span class="badge-hms badge-{{ l.status.lower() }}">{{ l.status }}</span></td>
+          </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state py-4"><div class="empty-state-text">No recent leave requests</div></div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Complaint Chart -->
+<div class="row g-4">
+  <div class="col-lg-12 animate-fade-in-up stagger-3">
+    <div class="hms-card">
+      <div class="hms-card-header">
+        <span class="hms-card-title"><i class="bi bi-pie-chart text-primary"></i> Complaint Status Overview</span>
+      </div>
+      <div class="hms-card-body">
+        {% if complaint_chart %}
+        <div class="chart-container" style="max-height:220px;">
+          <canvas id="complaintChart"></canvas>
+        </div>
+        {% else %}
+        <div class="empty-state" style="padding:2rem 1rem;">
+          <div class="empty-state-icon"><i class="bi bi-pie-chart"></i></div>
+          <div class="empty-state-text">No complaint data yet</div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+{% if complaint_chart %}
+<script>
+const ctx = document.getElementById('complaintChart');
+if (ctx) {
+  const labels = {{ complaint_chart | map(attribute='status') | list | tojson }};
+  const data   = {{ complaint_chart | map(attribute='cnt')    | list | tojson }};
+  new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels,
+      datasets: [{
+        data,
+        backgroundColor: ['#DBEAFE','#FEF3C7','#D1FAE5','#F3F4F6'],
+        borderColor:     ['#2563EB','#F79009','#12B76A','#9CA3AF'],
+        borderWidth: 2,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { font: { family: 'Plus Jakarta Sans', size: 12 } } },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.raw}` } }
+      },
+      animation: { animateScale: true, animateRotate: true, duration: 1000 }
+    }
+  });
+}
+</script>
+{% endif %}
+{% endblock %}

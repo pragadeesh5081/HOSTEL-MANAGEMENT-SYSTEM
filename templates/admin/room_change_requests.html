@@ -1,0 +1,69 @@
+{% extends "layouts/dashboard.html" %}
+{% block title %}Room Change Requests — HMS{% endblock %}
+{% block page_title %}Room Change Requests{% endblock %}
+{% block sidebar_role %}Admin Panel{% endblock %}
+{% block sidebar_nav %}{% include 'admin/_nav.html' %}{% endblock %}
+
+{% block content %}
+<div class="hms-card animate-fade-in-up">
+  <div class="hms-card-header">
+    <span class="hms-card-title"><i class="bi bi-arrow-left-right text-primary"></i> Room Change Requests</span>
+    <div class="hms-search" style="width:220px;">
+      <i class="bi bi-search hms-search-icon"></i>
+      <input type="text" class="hms-search-input" data-search-table="changeTable" placeholder="Search…" style="width:100%;"/>
+    </div>
+  </div>
+  <div class="table-responsive-hms">
+    {% if requests %}
+    <table class="hms-table" id="changeTable">
+      <thead>
+        <tr><th>Student</th><th>Current Room</th><th>Requested Room</th><th>Reason</th><th>Requested At</th><th>Status</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+      {% for req in requests %}
+      <tr>
+        <td>
+          <div class="fw-600" style="font-size:0.85rem;">{{ req.full_name }}</div>
+          <div style="font-size:0.75rem;color:var(--hms-text-muted);">{{ req.registration_number }}</div>
+        </td>
+        <td class="fw-600">Room {{ req.current_room }}</td>
+        <td class="fw-600" style="color:var(--hms-teal);">Room {{ req.requested_room }}</td>
+        <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:0.82rem;" title="{{ req.reason }}">{{ req.reason }}</td>
+        <td><small style="color:var(--hms-text-muted);">{{ req.requested_at|format_date('%b %d, %Y') }}</small></td>
+        <td><span class="badge-hms badge-{{ req.status.lower() }}">{{ req.status }}</span></td>
+        <td>
+          {% if req.status == 'Pending' %}
+          <div class="d-flex gap-2">
+            <form method="POST" action="{{ url_for('admin.review_change_request', request_id=req.request_id) }}" style="display:inline;">
+              <input type="hidden" name="decision" value="Approved"/>
+              <button type="submit" class="btn-hms-teal" style="padding:3px 10px;font-size:0.78rem;"
+                      data-confirm="Approve room change for {{ req.full_name }}?">
+                Approve
+              </button>
+            </form>
+            <form method="POST" action="{{ url_for('admin.review_change_request', request_id=req.request_id) }}" style="display:inline;">
+              <input type="hidden" name="decision" value="Rejected"/>
+              <button type="submit" class="btn-danger-sm"
+                      data-confirm="Reject room change for {{ req.full_name }}?">
+                Reject
+              </button>
+            </form>
+          </div>
+          {% else %}
+          <small style="color:var(--hms-text-muted);">{{ req.reviewed_at|format_date('%b %d') if req.reviewed_at else '—' }}</small>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-state-icon"><i class="bi bi-arrow-left-right"></i></div>
+      <div class="empty-state-title">No change requests</div>
+      <div class="empty-state-text">No room change requests have been submitted.</div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

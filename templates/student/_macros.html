@@ -1,0 +1,15 @@
+{% macro student_sidebar(active) %}
+<div class="nav-section-label">Main</div>
+<div class="nav-item"><a href="{{ url_for('student.dashboard') }}" class="nav-link {% if active=='dashboard' %}active{% endif %}"><i class="bi bi-grid-1x2 nav-icon"></i><span class="nav-text">Dashboard</span></a></div>
+<div class="nav-item"><a href="{{ url_for('student.profile') }}" class="nav-link {% if active=='profile' %}active{% endif %}"><i class="bi bi-person-circle nav-icon"></i><span class="nav-text">My Profile</span></a></div>
+<div class="nav-item"><a href="{{ url_for('student.my_room') }}" class="nav-link {% if active=='room' %}active{% endif %}"><i class="bi bi-door-open nav-icon"></i><span class="nav-text">My Room</span></a></div>
+<div class="nav-section-label" style="margin-top:8px;">Leave</div>
+<div class="nav-item"><a href="{{ url_for('student.apply_leave') }}" class="nav-link {% if active=='apply_leave' %}active{% endif %}"><i class="bi bi-calendar-plus nav-icon"></i><span class="nav-text">Apply Leave</span></a></div>
+<div class="nav-item"><a href="{{ url_for('student.leave_history') }}" class="nav-link {% if active=='leave_history' %}active{% endif %}"><i class="bi bi-calendar-check nav-icon"></i><span class="nav-text">Leave History</span></a></div>
+<div class="nav-section-label" style="margin-top:8px;">Support</div>
+<div class="nav-item"><a href="{{ url_for('student.submit_complaint') }}" class="nav-link {% if active=='submit_complaint' %}active{% endif %}"><i class="bi bi-chat-left-text nav-icon"></i><span class="nav-text">New Complaint</span></a></div>
+<div class="nav-item"><a href="{{ url_for('student.my_complaints') }}" class="nav-link {% if active=='complaints' %}active{% endif %}"><i class="bi bi-clipboard2-data nav-icon"></i><span class="nav-text">My Complaints</span></a></div>
+<div class="nav-item"><a href="{{ url_for('student.announcements') }}" class="nav-link {% if active=='announcements' %}active{% endif %}"><i class="bi bi-megaphone nav-icon"></i><span class="nav-text">Announcements</span></a></div>
+<div class="nav-section-label" style="margin-top:8px;">Account</div>
+<div class="nav-item"><a href="{{ url_for('auth.logout') }}" class="nav-link"><i class="bi bi-box-arrow-right nav-icon"></i><span class="nav-text">Logout</span></a></div>
+{% endmacro %}

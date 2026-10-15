@@ -1,0 +1,88 @@
+{% extends "layouts/dashboard.html" %}
+{% block title %}Add Student — HMS{% endblock %}
+{% block page_title %}Add Student{% endblock %}
+{% block sidebar_role %}Admin Panel{% endblock %}
+{% block sidebar_nav %}{% include 'admin/_nav.html' %}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center animate-fade-in-up">
+  <div class="col-lg-8">
+    <div class="hms-card">
+      <div class="hms-card-header">
+        <span class="hms-card-title"><i class="bi bi-person-plus text-primary"></i> Add New Student</span>
+        <a href="{{ url_for('admin.students') }}" class="btn-hms-outline" style="padding:0.4rem 1rem;font-size:0.82rem;">
+          <i class="bi bi-arrow-left me-1"></i> Back
+        </a>
+      </div>
+      <div class="hms-card-body">
+        <form method="POST" action="{{ url_for('admin.add_student') }}" novalidate>
+          <h6 class="fw-700 mb-4" style="color:var(--hms-text-muted);font-size:0.75rem;text-transform:uppercase;letter-spacing:0.08em;">Account Information</h6>
+          <div class="row g-4">
+            <div class="col-md-6">
+              <label class="form-label fw-600" style="font-size:0.85rem;">Full Name *</label>
+              <input type="text" name="full_name" class="hms-input" required
+                     value="{{ request.form.get('full_name','') }}"/>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-600" style="font-size:0.85rem;">Email *</label>
+              <input type="email" name="email" class="hms-input" required
+                     value="{{ request.form.get('email','') }}"/>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-600" style="font-size:0.85rem;">Phone</label>
+              <input type="tel" name="phone" class="hms-input"
+                     value="{{ request.form.get('phone','') }}"/>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-600" style="font-size:0.85rem;">Password *</label>
+              <input type="password" name="password" class="hms-input" required
+                     placeholder="Minimum 6 characters"/>
+            </div>
+          </div>
+
+          <hr class="hms-divider"/>
+          <h6 class="fw-700 mb-4" style="color:var(--hms-text-muted);font-size:0.75rem;text-transform:uppercase;letter-spacing:0.08em;">Student Details</h6>
+          <div class="row g-4">
+            <div class="col-md-6">
+              <label class="form-label fw-600" style="font-size:0.85rem;">Registration Number *</label>
+              <input type="text" name="registration_number" class="hms-input" required
+                     value="{{ request.form.get('registration_number','') }}"/>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-600" style="font-size:0.85rem;">Department</label>
+              <input type="text" name="department" class="hms-input"
+                     value="{{ request.form.get('department','') }}" placeholder="e.g. Computer Science"/>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-600" style="font-size:0.85rem;">Academic Year</label>
+              <input type="text" name="academic_year" class="hms-input"
+                     value="{{ request.form.get('academic_year','') }}" placeholder="e.g. 2nd Year"/>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-600" style="font-size:0.85rem;">Guardian Name</label>
+              <input type="text" name="guardian_name" class="hms-input"
+                     value="{{ request.form.get('guardian_name','') }}"/>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-600" style="font-size:0.85rem;">Guardian Phone</label>
+              <input type="tel" name="guardian_phone" class="hms-input"
+                     value="{{ request.form.get('guardian_phone','') }}"/>
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-600" style="font-size:0.85rem;">Address</label>
+              <textarea name="address" class="hms-input" rows="2" style="resize:vertical;">{{ request.form.get('address','') }}</textarea>
+            </div>
+            <div class="col-12 d-flex gap-3">
+              <button type="submit" class="btn-hms-primary" data-loading>
+                <span class="btn-text"><i class="bi bi-person-check me-1"></i> Create Student</span>
+                <span class="btn-spinner"></span>
+              </button>
+              <a href="{{ url_for('admin.students') }}" class="btn-hms-outline">Cancel</a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
