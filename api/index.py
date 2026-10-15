@@ -10,6 +10,3 @@ from app import create_app
 
 # Vercel's Python runtime looks for WSGI callable named `app`
 app = create_app()
-
-if __name__ == "__main__":
-    app.run(debug=True)
