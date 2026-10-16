@@ -421,3 +421,21 @@ class TestDatabaseValidation:
                                   data={'decision': 'INVALID'},
                                   follow_redirects=False)
         assert resp.status_code == 302
+
+
+class TestPostgresAdapter:
+    def test_query_adapter(self):
+        from models.db import _adapt_query
+        sql = "SELECT * FROM Users WHERE email = ? AND updated_at = datetime('now') AND joined_date = date('now')"
+        adapted = _adapt_query(sql)
+        assert '?' not in adapted
+        assert '%s' in adapted
+        assert 'CURRENT_TIMESTAMP' in adapted
+        assert 'CURRENT_DATE' in adapted
+
+    def test_postgres_url_detection(self):
+        from models.db import get_postgres_url, is_postgres
+        with patch.dict(os.environ, {'POSTGRES_URL': 'postgres://user:pass@ep-test.neon.tech/neondb'}):
+            assert is_postgres() is True
+            assert get_postgres_url().startswith('postgresql://')
+

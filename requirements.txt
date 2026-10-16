@@ -5,8 +5,9 @@ Flask-WTF==1.2.1
 WTForms==3.1.2
 email-validator==2.2.0
 
+# PostgreSQL / Neon support for production & cloud deployments
+psycopg2-binary==2.9.13
+
 # Testing (no DB required — SQLite is built into Python)
 pytest==9.1.1
 pytest-cov==7.1.0
-
-# Note: SQLite is built into Python — no extra database driver needed!
