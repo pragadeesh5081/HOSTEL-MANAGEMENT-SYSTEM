@@ -3,9 +3,11 @@ from models import db
 
 
 def get_user_by_email(email):
+    if not email:
+        return None
     return db.fetchone(
-        "SELECT * FROM Users WHERE email = ? AND is_active = 1",
-        (email,)
+        "SELECT * FROM Users WHERE LOWER(email) = LOWER(?) AND is_active = 1",
+        (email.strip(),)
     )
 
 

@@ -19,7 +19,7 @@ def login():
         return redirect(url_for('auth.index'))
     error = None
     if request.method == 'POST':
-        email       = request.form.get('email', '').strip()
+        email       = request.form.get('email', '').strip().lower()
         password    = request.form.get('password', '')
         chosen_role = request.form.get('role', 'student')   # tab selected by user
         if not email or not password:
@@ -29,12 +29,6 @@ def login():
             if user and auth_service.verify_password(user, password):
                 if not user['is_active']:
                     error = 'Your account has been deactivated. Contact admin.'
-                elif user['role'] != chosen_role:
-                    # Role mismatch — give a friendly but safe error
-                    if chosen_role == 'admin':
-                        error = 'This account is not an admin account. Please use the Student tab.'
-                    else:
-                        error = 'This is an admin account. Please use the Admin tab to sign in.'
                 else:
                     session['user_id'] = user['user_id']
                     session['role']    = user['role']
@@ -56,7 +50,7 @@ def register():
     if request.method == 'POST':
         role       = request.form.get('role', 'student')
         full_name  = request.form.get('full_name', '').strip()
-        email      = request.form.get('email', '').strip()
+        email      = request.form.get('email', '').strip().lower()
         phone      = request.form.get('phone', '').strip() or None
         password   = request.form.get('password', '')
         confirm    = request.form.get('confirm_password', '')

@@ -398,7 +398,7 @@ def add_admin():
     """Create a new admin account."""
     if request.method == 'POST':
         full_name = request.form.get('full_name', '').strip()
-        email     = request.form.get('email', '').strip()
+        email     = request.form.get('email', '').strip().lower()
         phone     = request.form.get('phone', '').strip() or None
         password  = request.form.get('password', '')
         confirm   = request.form.get('confirm_password', '')
